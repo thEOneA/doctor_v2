@@ -1,7 +1,7 @@
 ---
 title: AI Assistant Doctor_SDX_Fudan
 emoji: 🩺
-colorFrom: teal
+colorFrom: blue
 colorTo: indigo
 sdk: gradio
 sdk_version: 4.19.1
