@@ -1,5 +1,7 @@
-# Access the public app now:
-(https://hvdshin-ai-doctor-chat.hf.space)
+# Access the Public App Now:
+[(https://hvdshin-ai-doctor-chat.hf.space)](https://huggingface.co/spaces/hvdshin/AI_Assistant_Doctor)
+
+[![Hugging Face Space](https://img.shields.io/badge/Hugging%20Face-Space-blue)](https://your-username-ai-doctor-chat.hf.space)
 
 # Project Setup Guide_Nick_FDU
 
