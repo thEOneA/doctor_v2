@@ -1,94 +1,84 @@
-# gradio_app.py
 from dotenv import load_dotenv
 load_dotenv()
 
-import os
 import gradio as gr
 from brain_of_the_doctor import encode_image, analyze_image_with_query
+from voice_of_the_doctor import text_to_speech_with_gtts
 
-system_prompt = """
-You are an AI Doctor assistant. Analyze medical images. If you see symptoms, provide possible differentials and suggest remedies. Respond naturally in one paragraph without referencing the image explicitly.
+system_prompt = """You have to act as a professional doctor, I know you are not but this is for learning purposes. 
+What's in this image? Do you find anything medically concerning? If you suggest a differential diagnosis, suggest some remedies.
+Don't add numbers or special characters. Your response should be a concise paragraph in plain language as if answering a patient directly.
 """
 
-# Maintain chat history
 chat_history = []
 uploaded_images = []
 
 def chat_function(message, history, image_filepath=None):
     global chat_history, uploaded_images
 
-    # Initialize chat history if not existing
-    if 'chat_history' not in globals():
-        global chat_history
-        chat_history = []
-
-    # Handle image upload and immediate analysis
     if image_filepath:
         encoded_img = encode_image(image_filepath)
         uploaded_images.append(encoded_img)
-
-        content = message if message else "Image uploaded."
+        text = message if message.strip() else "Image uploaded"
+        img_html = f'<img src="data:image/jpeg;base64,{encoded_img}" style="max-width: 200px;"/>'
+        content = f"{text}\n{img_html}" if text != "Image uploaded" else img_html
         chat_history.append({"role": "user", "content": content})
 
-        full_query = system_prompt
-        response = analyze_image_with_query(query=full_query, encoded_image=encoded_img)
+        query = system_prompt
+        response = analyze_image_with_query(query=query, encoded_image=encoded_img)
         chat_history.append({"role": "assistant", "content": response})
+
+        text_to_speech_with_gtts(response)
         return chat_history
 
-    # Handle text input
-    if message:
-        if uploaded_images:
-            encoded_img = uploaded_images[-1]
-            full_query = system_prompt + " " + message
-            response = analyze_image_with_query(query=full_query, encoded_image=encoded_img)
-        else:
-            response = "Please upload an image for analysis."
-
+    elif message.strip():
         chat_history.append({"role": "user", "content": message})
-        chat_history.append({"role": "assistant", "content": response})
+        
+        if uploaded_images:
+            query = system_prompt + " " + message
+            response = analyze_image_with_query(query=query, encoded_image=uploaded_images[-1])
+        else:
+            response = "Please upload an image so I can analyze your condition."
 
+        chat_history.append({"role": "assistant", "content": response})
+        text_to_speech_with_gtts(response)
         return chat_history
 
     return chat_history
-
-# Gradio Interface
-uploaded_images = []
 
 def create_chat_interface():
     css = """
     .chatbot {
         height: 600px;
-    }
-    .chatbot .user, .chatbot .assistant {
-        padding: 8px;
-        border-radius: 10px;
-        margin: 4px;
+        overflow-y: auto;
+        background-color: #f5f5f5;
+        padding: 10px;
     }
     """
 
-    with gr.Blocks(title="AI Doctor Chat", css=css) as demo:
-        chatbot = gr.Chatbot(label="LLVM Doctor_Nick Shin 申东勋")
-        with gr.Row():
-            text_input = gr.Textbox(placeholder="Type your message here", scale=4)
-            image_input = gr.Image(type="filepath", scale=1)
-            submit_btn = gr.Button("Send")
+    with gr.Blocks(css=css) as demo:
+        chatbot = gr.Chatbot(label="LLVM Doctor_Nick Shin 申东勋 신동훈_Fudan University", type="messages", elem_classes="chatbot")
+        msg = gr.Textbox(placeholder="Ask anything or upload an image")
+        image_input = gr.Image(type="filepath")
+
+        submit_btn = gr.Button("Submit")
 
         submit_btn.click(
-            chat_function,
-            inputs=[text_input, chatbot, image_input],
+            fn=chat_function,
+            inputs=[msg, chatbot, image_input],
             outputs=chatbot
         )
 
-        submit_btn.click(lambda: ("", None), None, [text_input, image_input])
+        def clear_inputs():
+            return "", None
 
-    return gr.Interface(
-        fn=chat_function,
-        inputs=[text_input, chatbot, image_input],
-        outputs=chatbot,
-        allow_flagging="never",
-        title="AI Doctor Assistant",
-        css=css
-    )
+        submit_btn.click(
+            fn=clear_inputs,
+            outputs=[msg, image_input]
+        )
 
-app = create_chat_interface()
-app.launch()
+    return demo
+
+if __name__ == "__main__":
+    app = create_chat_interface()
+    app.launch()
