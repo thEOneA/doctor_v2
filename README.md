@@ -69,10 +69,3 @@ sudo apt install ffmpeg portaudio19-dev
 #### Install PortAudio:
 1. Download the PortAudio binaries from the official website: [PortAudio Downloads](http://www.portaudio.com/download.html)
 2. Follow the installation instructions provided on the website.
-
->>>>>>> 16cb34395cddb1da02bc0377b6ad9b8c885fb286
----
-
-# AI Assistant Doctor
-
-An AI-powered medical assistant that helps answer health-related questions. Change
