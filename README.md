@@ -1,4 +1,4 @@
-# Access the Public App
+# Access the Public App_Nick Shin_Fudan
 Try My Latest LLVM Doctor Assistant here: 
 https://huggingface.co/spaces/hvdshin/AI_Assistant_Doctor
 
