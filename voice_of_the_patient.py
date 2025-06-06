@@ -17,7 +17,7 @@ def record_audio(file_path, timeout=20, phrase_time_limit=None):
     Args:
     file_path (str): Path to save the recorded audio file.
     timeout (int): Maximum time to wait for a phrase to start (in seconds).
-    phrase_time_lfimit (int): Maximum time for the phrase to be recorded (in seconds).
+    phrase_time_limit (int): Maximum time for the phrase to be recorded (in seconds).
     """
     recognizer = sr.Recognizer()
     
@@ -34,7 +34,7 @@ def record_audio(file_path, timeout=20, phrase_time_limit=None):
             # Convert the recorded audio to an MP3 file
             wav_data = audio_data.get_wav_data()
             audio_segment = AudioSegment.from_wav(BytesIO(wav_data))
-            audio_segment.export(file_path, format="mp3_22050_32", bitrate="128k")
+            audio_segment.export(file_path, format="mp3", bitrate="128k")
             
             logging.info(f"Audio saved to {file_path}")
 
